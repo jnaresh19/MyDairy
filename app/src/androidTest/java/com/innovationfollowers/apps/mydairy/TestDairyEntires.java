@@ -14,7 +14,7 @@ import android.test.AndroidTestCase;
 
 import com.innovationfollowers.apps.mydairy.db.DairyEntriesContract;
 import com.innovationfollowers.apps.mydairy.db.DairyEntriesDbHelper;
-import com.innovationfollowers.apps.mydairy.db.DairyEntriesImagesDbHelper;
+
 
 import java.util.List;
 
@@ -27,13 +27,10 @@ public class TestDairyEntires extends AndroidTestCase {
 
     @Override
     protected void setUp() throws Exception {
-
-        super.setUp();
         if(!isInitialized)
         {
             //delete the previous databases if any
             mContext.deleteDatabase(DairyEntriesDbHelper.DATABASE_NAME);
-            mContext.deleteDatabase(DairyEntriesImagesDbHelper.DATABASE_NAME);
         }
         isInitialized = true;
     }
@@ -96,13 +93,7 @@ public class TestDairyEntires extends AndroidTestCase {
         assertTrue(deletedId == 1);
     }
 
-    public void testDairyEntriesImagesDbCreated()
-    {
-        DairyEntriesImagesDbHelper helper = new DairyEntriesImagesDbHelper(mContext);
-        SQLiteDatabase database = helper.getWritableDatabase();
-        assertTrue(database.isOpen());
-        database.close();
-    }
+
 
     public void testInsertAndReadImagesOfDairyEntry()
     {
@@ -113,23 +104,45 @@ public class TestDairyEntires extends AndroidTestCase {
         assertTrue(id != -1);
 
 
-        // now add a image for dairy entry
-        DairyEntriesImagesDbHelper imagesDbHelper = new DairyEntriesImagesDbHelper(mContext);
-        database = imagesDbHelper.getWritableDatabase();
-        boolean imageInsertStatus = imagesDbHelper.insertDairyEntryImages(id,new String[]{"/sdcard/Pictures/Photo note/test.jpg"},database);
+        boolean imageInsertStatus = helper.insertDairyEntryImages(id,new String[]{"/sdcard/Pictures/Photo note/test.jpg"},database);
         assertTrue(imageInsertStatus);
 
         //database = helper.getReadableDatabase();
-        List<byte[]> allImagesOfDairyEntry = imagesDbHelper.getAllImagesOfDairyEntry(id, database);
+        List<byte[]> allImagesOfDairyEntry = helper.getAllImagesOfDairyEntry(id, database);
         assertTrue(allImagesOfDairyEntry.size() == 1);
 
+
+    }
+
+    public void testReadDairyEntriesWithImages()
+    {
+        //first add a dairy entry
+        DairyEntriesDbHelper helper = new DairyEntriesDbHelper(mContext);
+        SQLiteDatabase database = helper.getWritableDatabase();
+        long id = helper.insertDairyEntry("Maldives", "Enjoyed maldives Trip", "12-10-15", database);
+        assertTrue(id != -1);
+
+
+        // now add a image for dairy entry
+
+        boolean imageInsertStatus = helper.insertDairyEntryImages(id, new String[]{"/sdcard/Pictures/Photo note/test.jpg"}, database);
+        assertTrue(imageInsertStatus);
+
+        //database = helper.getReadableDatabase();
+        List<byte[]> allImagesOfDairyEntry = helper.getAllImagesOfDairyEntry(id, database);
+        assertTrue(allImagesOfDairyEntry.size() == 1);
+
+        Cursor cursor = helper.getAllDairyEntriesWithImageData(database);
+        cursor.moveToFirst();
+        assertTrue(cursor.getCount() >= 1);
 
     }
 
 
 
 
-    public void _testInsertDummyTestData()
+
+    public void testInsertDummyTestData()
     {
         DairyEntriesDbHelper helper = new DairyEntriesDbHelper(mContext);
         SQLiteDatabase database = helper.getWritableDatabase();

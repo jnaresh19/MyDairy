@@ -8,9 +8,12 @@
 
 package com.innovationfollowers.apps.mydairy;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +23,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+
+import com.innovationfollowers.apps.mydairy.db.DairyEntriesContract;
+import com.innovationfollowers.apps.mydairy.db.DairyEntriesDbHelper;
+import com.innovationfollowers.apps.mydairy.db.DairyEntriesImagesContract;
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -48,6 +58,29 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        displayDairyEntires();
+    }
+
+    private void displayDairyEntires() {
+        // get the list view
+        ListView listView = (ListView) findViewById(R.id.dairyEntriesListView);
+
+        // prepare data
+
+        String[] fromColumns = {DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE, DairyEntriesContract.DairyEntries.COLUMN_NAME_TITLE,
+                DairyEntriesContract.DairyEntries.COLUMN_NAME_DESCRIPTION};
+        int[] toViews = {R.id.dairyEntryDateText, R.id.dairyEntryTitleText,R.id.dairyEntryDescText};
+
+        DairyEntriesDbHelper dbHelper = new DairyEntriesDbHelper(getBaseContext());
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
+
+        Cursor cursor =  dbHelper.getAllDairyEntries(database);
+
+
+        //cursor adapter
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.list_view_dairy_entries, cursor, fromColumns, toViews, 0);
+        listView.setAdapter(adapter);
     }
 
     @Override

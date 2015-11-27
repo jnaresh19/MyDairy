@@ -15,6 +15,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Naresh on 21-11-2015.
  */
@@ -32,6 +38,17 @@ public class DairyEntriesDbHelper extends SQLiteOpenHelper {
                     DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE + " TEXT);" ;
     public static final String DATABASE_OPERATIONS = "DATABASE OPERATIONS";
 
+    private static final String CREATE_QUERY_IMAGES =
+            "CREATE TABLE "+
+                    DairyEntriesImagesContract.DairyEntriesImages.TABLE_NAME + "(" +
+                    DairyEntriesImagesContract.DairyEntriesImages._ID + " INTEGER PRIMARY KEY ASC," +
+                    DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_ID + " INTEGER," +
+                    DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_DATA + " BLOB," +
+                    "FOREIGN KEY("+DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_ID+") " +
+                    "REFERENCES "+DairyEntriesContract.DairyEntries.TABLE_NAME + "("+
+                    DairyEntriesContract.DairyEntries._ID+"))";
+
+
 
     public DairyEntriesDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,7 +59,8 @@ public class DairyEntriesDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_QUERY);
-        Log.i(DATABASE_OPERATIONS, "Db " + DairyEntriesContract.DairyEntries.TABLE_NAME + " created successfully..");
+        db.execSQL(CREATE_QUERY_IMAGES);
+        Log.i(DATABASE_OPERATIONS, "create query for " + DairyEntriesContract.DairyEntries.TABLE_NAME + " executed successfully..");
     }
 
 
@@ -92,6 +110,88 @@ public class DairyEntriesDbHelper extends SQLiteOpenHelper {
 
         return c;
     }
+
+    public Cursor getAllDairyEntriesWithImageData(SQLiteDatabase db)
+    {
+        Cursor c = db.rawQuery("select a._ID,a.title,a.description,a.entrydate,b.imagedata from "+DairyEntriesContract.DairyEntries.TABLE_NAME + " a "+
+                " INNER JOIN "+DairyEntriesImagesContract.DairyEntriesImages.TABLE_NAME + " b "+
+                " on a."+DairyEntriesContract.DairyEntries._ID + "=b."+DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_ID,new String[]{});
+        return c;
+    }
+
+
+    public boolean insertDairyEntryImages(long imageId,String[] imagePaths,SQLiteDatabase db)
+    {
+        for (int i = 0; i < imagePaths.length; i++) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_ID, imageId);
+            byte[] imageData = getImageData(imagePaths[i]);
+            if(null == imageData)
+            {
+                //error while inserting images into db.
+                //TODO insertion should be done under transaction
+                return false;
+            }
+            contentValues.put(DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_DATA, imageData);
+            long id = db.insert(DairyEntriesImagesContract.DairyEntriesImages.TABLE_NAME, null, contentValues);
+        }
+
+        Log.i(DATABASE_OPERATIONS, "dairy image entry inserted successfully..");
+        return true;
+    }
+
+    private byte[] getImageData(String imagePath) {
+
+        try {
+            FileInputStream in = new FileInputStream(new File(imagePath));
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            while (true) {
+                int r = in.read(buffer);
+                if (r == -1) break;
+                out.write(buffer, 0, r);
+            }
+
+            byte[] ret = out.toByteArray();
+            return ret;
+
+        } catch (Exception e) {
+            Log.d("ImageManager", "Error: " + e.toString());
+        }
+        return null;
+    }
+
+    public List<byte[]> getAllImagesOfDairyEntry(long imageId,SQLiteDatabase db)
+    {
+        List<byte[]> images = new ArrayList<>(2);
+
+        String[] projection = {
+                DairyEntriesImagesContract.DairyEntriesImages._ID,
+                DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_DATA,
+        };
+
+
+        Cursor c = db.query(
+                DairyEntriesImagesContract.DairyEntriesImages.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_ID + "=?",                                // The columns for the WHERE clause
+                new String[]{String.valueOf(imageId)},                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        int blobColumnIndex = c.getColumnIndex(DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_DATA);
+        c.moveToFirst();
+        do {
+            images.add(c.getBlob(blobColumnIndex));
+        } while (c.moveToNext());
+
+        return images;
+    }
+
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
