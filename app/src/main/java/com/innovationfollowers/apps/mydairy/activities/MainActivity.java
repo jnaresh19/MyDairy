@@ -1,21 +1,27 @@
 /*
- * Copyright (c) 2015. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
- * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
- * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
- * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
- * Vestibulum commodo. Ut rhoncus gravida arcu.
+ * Copyright  2015  InnovationFollowers
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package com.innovationfollowers.apps.mydairy;
+package com.innovationfollowers.apps.mydairy.activities;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,28 +29,40 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.innovationfollowers.apps.mydairy.R;
+import com.innovationfollowers.apps.mydairy.adapters.DairyEntryAdapter;
+import com.innovationfollowers.apps.mydairy.dao.DairyEntryDao;
 import com.innovationfollowers.apps.mydairy.db.DairyEntriesContract;
 import com.innovationfollowers.apps.mydairy.db.DairyEntriesDbHelper;
-import com.innovationfollowers.apps.mydairy.db.DairyEntriesImagesContract;
+import com.innovationfollowers.apps.mydairy.model.DairyEntry;
+
+import java.io.File;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener
+{
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -59,10 +77,20 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //if images folder doesn't exist , create it.
+        File applicationDir = new File(this.getFilesDir().toString());
+        File picturesDir = new File(applicationDir + "/Pictures");
+
+        if(!picturesDir.exists())
+        {
+            picturesDir.mkdir();
+        }
+
         displayDairyEntires();
     }
 
-    private void displayDairyEntires() {
+    private void displayDairyEntires()
+    {
         // get the list view
         ListView listView = (ListView) findViewById(R.id.dairyEntriesListView);
 
@@ -70,45 +98,46 @@ public class MainActivity extends AppCompatActivity
 
         String[] fromColumns = {DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE, DairyEntriesContract.DairyEntries.COLUMN_NAME_TITLE,
                 DairyEntriesContract.DairyEntries.COLUMN_NAME_DESCRIPTION};
-        int[] toViews = {R.id.dairyEntryDateText, R.id.dairyEntryTitleText,R.id.dairyEntryDescText};
+        int[] toViews = {R.id.dairyEntryDateText, R.id.dairyEntryTitleText, R.id.dairyEntryDescText};
 
-        DairyEntriesDbHelper dbHelper = new DairyEntriesDbHelper(getBaseContext());
-        SQLiteDatabase database = dbHelper.getReadableDatabase();
-
-        Cursor cursor =  dbHelper.getAllDairyEntries(database);
-
-
-        //cursor adapter
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.list_view_dairy_entries, cursor, fromColumns, toViews, 0);
+        DairyEntryDao dairyEntryDao = new DairyEntryDao(getBaseContext());
+        List<DairyEntry> dairyEntries = dairyEntryDao.getAllDairyEntries();
+        DairyEntryAdapter adapter = new DairyEntryAdapter(this,R.layout.list_view_dairy_entries,dairyEntries);
         listView.setAdapter(adapter);
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer.isDrawerOpen(GravityCompat.START))
+        {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        } else
+        {
             super.onBackPressed();
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_settings)
+        {
             return true;
         }
 
@@ -117,21 +146,28 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(MenuItem item)
+    {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_camera)
+        {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_gallery)
+        {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_slideshow)
+        {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_manage)
+        {
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_share)
+        {
 
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_send)
+        {
 
         }
 

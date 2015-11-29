@@ -1,11 +1,18 @@
 /*
- * Copyright (c) 2015. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
- * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
- * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
- * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
- * Vestibulum commodo. Ut rhoncus gravida arcu.
+ * Copyright  2015  InnovationFollowers
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.innovationfollowers.apps.mydairy.db;
 
 import android.content.ContentValues;
@@ -15,70 +22,60 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
+import com.innovationfollowers.apps.mydairy.model.DairyEntry;
+
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by Naresh on 21-11-2015.
  */
-public class DairyEntriesDbHelper extends SQLiteOpenHelper {
+public class DairyEntriesDbHelper extends SQLiteOpenHelper
+{
 
-    public static final  String DATABASE_NAME = "DairyEntries.db";
+    public static final String DATABASE_NAME = "DairyEntries.db";
     private static final int DATABASE_VERSION = 1;
 
     private static final String CREATE_QUERY =
-            "CREATE TABLE "+
+            "CREATE TABLE " +
                     DairyEntriesContract.DairyEntries.TABLE_NAME + "(" +
-                    DairyEntriesContract.DairyEntries._ID + " INTEGER PRIMARY KEY ASC," +
+                    DairyEntriesContract.DairyEntries._ID + " INTEGER PRIMARY KEY," +
                     DairyEntriesContract.DairyEntries.COLUMN_NAME_TITLE + " TEXT," +
                     DairyEntriesContract.DairyEntries.COLUMN_NAME_DESCRIPTION + " TEXT," +
-                    DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE + " TEXT);" ;
+                    DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE + " TEXT," +
+                    DairyEntriesContract.DairyEntries.COLUMN_NAME_IMAGEPATHS + " TEXT);";
     public static final String DATABASE_OPERATIONS = "DATABASE OPERATIONS";
 
-    private static final String CREATE_QUERY_IMAGES =
-            "CREATE TABLE "+
-                    DairyEntriesImagesContract.DairyEntriesImages.TABLE_NAME + "(" +
-                    DairyEntriesImagesContract.DairyEntriesImages._ID + " INTEGER PRIMARY KEY ASC," +
-                    DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_ID + " INTEGER," +
-                    DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_DATA + " BLOB," +
-                    "FOREIGN KEY("+DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_ID+") " +
-                    "REFERENCES "+DairyEntriesContract.DairyEntries.TABLE_NAME + "("+
-                    DairyEntriesContract.DairyEntries._ID+"))";
-
-
-
-    public DairyEntriesDbHelper(Context context) {
+    public DairyEntriesDbHelper(Context context)
+    {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        Log.i(DATABASE_OPERATIONS,"Db " + DATABASE_NAME + " created successfully..");
+        Log.i(DATABASE_OPERATIONS, "Db " + DATABASE_NAME + " created successfully..");
     }
 
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
+    public void onCreate(SQLiteDatabase db)
+    {
         db.execSQL(CREATE_QUERY);
-        db.execSQL(CREATE_QUERY_IMAGES);
-        Log.i(DATABASE_OPERATIONS, "create query for " + DairyEntriesContract.DairyEntries.TABLE_NAME + " executed successfully..");
     }
 
 
-    public long insertDairyEntry(String title, String desc, String date,SQLiteDatabase db)
+    public long insertDairyEntry(DairyEntry dairyEntry, SQLiteDatabase db)
     {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DairyEntriesContract.DairyEntries.COLUMN_NAME_TITLE, title);
-        contentValues.put(DairyEntriesContract.DairyEntries.COLUMN_NAME_DESCRIPTION, desc);
-        contentValues.put(DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE, date);
+        contentValues.put(DairyEntriesContract.DairyEntries.COLUMN_NAME_TITLE, dairyEntry.getTitle());
+        contentValues.put(DairyEntriesContract.DairyEntries.COLUMN_NAME_DESCRIPTION, dairyEntry.getDescription());
+        contentValues.put(DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE, dairyEntry.getDate());
+        contentValues.put(DairyEntriesContract.DairyEntries.COLUMN_NAME_IMAGEPATHS, convertToCommaDelimited(dairyEntry.getImagePaths()));
         long id = db.insert(DairyEntriesContract.DairyEntries.TABLE_NAME, null, contentValues);
         Log.i(DATABASE_OPERATIONS, "dairy entry inserted successfully..");
         return id;
     }
 
-    public int deleteDairyEntry(long id,SQLiteDatabase db)
+    public int deleteDairyEntry(long id, SQLiteDatabase db)
     {
         String selection = DairyEntriesContract.DairyEntries._ID + " = ?";
-        String[] selectionArgs = { String.valueOf(id) };
+        String[] selectionArgs = {String.valueOf(id)};
         return db.delete(DairyEntriesContract.DairyEntries.TABLE_NAME, selection, selectionArgs);
     }
 
@@ -88,113 +85,38 @@ public class DairyEntriesDbHelper extends SQLiteOpenHelper {
                 DairyEntriesContract.DairyEntries._ID,
                 DairyEntriesContract.DairyEntries.COLUMN_NAME_TITLE,
                 DairyEntriesContract.DairyEntries.COLUMN_NAME_DESCRIPTION,
-                DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE
+                DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE,
+                DairyEntriesContract.DairyEntries.COLUMN_NAME_IMAGEPATHS
         };
 
         String sortOrder =
                 DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE + " DESC";
 
         Cursor c = db.query(
-                DairyEntriesContract.DairyEntries.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        );
-
-        if ( c != null) {
-            c.moveToFirst();
-        }
+                DairyEntriesContract.DairyEntries.TABLE_NAME, projection, null, null, null, null, sortOrder);
 
         return c;
     }
-
-    public Cursor getAllDairyEntriesWithImageData(SQLiteDatabase db)
-    {
-        Cursor c = db.rawQuery("select a._ID,a.title,a.description,a.entrydate,b.imagedata from "+DairyEntriesContract.DairyEntries.TABLE_NAME + " a "+
-                " INNER JOIN "+DairyEntriesImagesContract.DairyEntriesImages.TABLE_NAME + " b "+
-                " on a."+DairyEntriesContract.DairyEntries._ID + "=b."+DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_ID,new String[]{});
-        return c;
-    }
-
-
-    public boolean insertDairyEntryImages(long imageId,String[] imagePaths,SQLiteDatabase db)
-    {
-        for (int i = 0; i < imagePaths.length; i++) {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_ID, imageId);
-            byte[] imageData = getImageData(imagePaths[i]);
-            if(null == imageData)
-            {
-                //error while inserting images into db.
-                //TODO insertion should be done under transaction
-                return false;
-            }
-            contentValues.put(DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_DATA, imageData);
-            long id = db.insert(DairyEntriesImagesContract.DairyEntriesImages.TABLE_NAME, null, contentValues);
-        }
-
-        Log.i(DATABASE_OPERATIONS, "dairy image entry inserted successfully..");
-        return true;
-    }
-
-    private byte[] getImageData(String imagePath) {
-
-        try {
-            FileInputStream in = new FileInputStream(new File(imagePath));
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            while (true) {
-                int r = in.read(buffer);
-                if (r == -1) break;
-                out.write(buffer, 0, r);
-            }
-
-            byte[] ret = out.toByteArray();
-            return ret;
-
-        } catch (Exception e) {
-            Log.d("ImageManager", "Error: " + e.toString());
-        }
-        return null;
-    }
-
-    public List<byte[]> getAllImagesOfDairyEntry(long imageId,SQLiteDatabase db)
-    {
-        List<byte[]> images = new ArrayList<>(2);
-
-        String[] projection = {
-                DairyEntriesImagesContract.DairyEntriesImages._ID,
-                DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_DATA,
-        };
-
-
-        Cursor c = db.query(
-                DairyEntriesImagesContract.DairyEntriesImages.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_ID + "=?",                                // The columns for the WHERE clause
-                new String[]{String.valueOf(imageId)},                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
-
-        int blobColumnIndex = c.getColumnIndex(DairyEntriesImagesContract.DairyEntriesImages.COLUMN_NAME_IMAGE_DATA);
-        c.moveToFirst();
-        do {
-            images.add(c.getBlob(blobColumnIndex));
-        } while (c.moveToNext());
-
-        return images;
-    }
-
 
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+    {
+        Log.w(DairyEntriesDbHelper.class.getName(),
+                "Upgrading database from version " + oldVersion + " to "
+                        + newVersion + ", which will destroy all old data");
+        db.execSQL("DROP TABLE IF EXISTS " + DairyEntriesContract.DairyEntries.TABLE_NAME);
+        onCreate(db);
+    }
 
+    public static String convertToCommaDelimited(String[] list) {
+        StringBuilder ret = new StringBuilder("");
+        for (int i = 0; list != null && i < list.length; i++) {
+            ret.append(list[i]);
+            if (i < list.length - 1) {
+                ret.append(',');
+            }
+        }
+        return ret.toString();
     }
 }
