@@ -51,7 +51,7 @@ public class CreateTestData extends AndroidTestCase {
         DairyEntry dairyEntry = new DairyEntry();
 
         for (int i = 1; i <=10; i++) {
-            dairyEntry.setTitle("Enjoyed in Goa "+i);
+            dairyEntry.setTitle("Enjoyed in Goa Enjoyed in Goa "+i);
             dairyEntry.setDescription("Awsome fun in Goa "+i );
             dairyEntry.setDate("12-10-15");
             dairyEntry.setImagePaths(new String[]{"IMG_"+i+".jpg"});
