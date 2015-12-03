@@ -5,43 +5,54 @@
     android:weightSum="1">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/dairyEntryTitleText"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
-        android:id="@+id/dairyEntryDescText"
-        android:layout_below="@+id/dairyEntryDateText"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
+        android:layout_width="250px"
+        android:layout_height="250px"
+        android:textAppearance="?android:attr/textAppearanceLargeInverse"
+        android:text="large Text"
+        android:textSize="75px"
         android:id="@+id/dairyEntryDateText"
-        android:layout_below="@+id/dairyEntryTitleText"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:background="@drawable/border_ui"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:textAlignment="center"/>
 
-    <ImageView
-        android:layout_width="157dp"
-        android:layout_height="105dp"
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="100px"
+        android:textAppearance="?android:attr/textAppearanceSmallInverse"
+        android:text="Small Text"
+        android:id="@+id/dairyEntryTitleText"
+        android:background="@drawable/border_ui"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/dairyEntryDateText"
+        android:layout_alignRight="@+id/dairyEntryDescText"
+        android:layout_alignEnd="@+id/dairyEntryDescText" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="150px"
+        android:textAppearance="?android:attr/textAppearanceSmallInverse"
+        android:text="Small Text"
+        android:textSize="45px"
+        android:id="@+id/dairyEntryDescText"
+        android:background="@drawable/border_ui"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:layout_gravity="center"
+        android:layout_alignBottom="@+id/dairyEntryImage"
+        android:layout_toRightOf="@+id/dairyEntryDateText"
+        android:layout_toEndOf="@+id/dairyEntryDateText" />
+
+   <ImageView
+        android:layout_width="100px"
+        android:layout_height="250px"
         android:id="@+id/dairyEntryImage"
         android:layout_gravity="right"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/dairyEntryDescText" />
-
+       android:layout_alignParentTop="true"
+       android:layout_alignRight="@+id/dairyEntryDescText"
+       android:layout_alignEnd="@+id/dairyEntryDescText" />
 </RelativeLayout>
