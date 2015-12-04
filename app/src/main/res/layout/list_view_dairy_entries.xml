@@ -4,28 +4,15 @@
     android:layout_height="match_parent"
     android:weightSum="1">
 
-    <ImageView
-        android:layout_width="157dp"
-        android:layout_height="105dp"
-        android:id="@+id/dairyEntryImage"
-        android:layout_gravity="right"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/dairyEntryDescText" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text Large Text Large Text"
+        android:text="Large Text"
         android:id="@+id/dairyEntryTitleText"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:ellipsize="marquee"
-        android:layout_toLeftOf="@id/dairyEntryImage"
-        android:singleLine="true"/>
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -35,10 +22,7 @@
         android:id="@+id/dairyEntryDescText"
         android:layout_below="@+id/dairyEntryDateText"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:ellipsize="marquee"
-        android:layout_toLeftOf="@id/dairyEntryImage"
-        android:singleLine="true"/>
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -48,11 +32,16 @@
         android:id="@+id/dairyEntryDateText"
         android:layout_below="@+id/dairyEntryTitleText"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:ellipsize="marquee"
-        android:layout_toLeftOf="@id/dairyEntryImage"
-        android:singleLine="true"/>
+        android:layout_alignParentStart="true" />
 
-
+    <ImageView
+        android:layout_width="157dp"
+        android:layout_height="105dp"
+        android:id="@+id/dairyEntryImage"
+        android:layout_gravity="right"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@+id/dairyEntryDescText" />
 
 </RelativeLayout>
