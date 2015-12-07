@@ -70,6 +70,8 @@ public class DairyEntryAdapter extends ArrayAdapter<DairyEntry>
             holder.desc = (TextView) row.findViewById(R.id.dairyEntryDescText);
             holder.date = (TextView) row.findViewById(R.id.dairyEntryDateText);
             holder.image = (ImageView) row.findViewById(R.id.dairyEntryImage);
+            holder.image.setScaleType(
+                    ImageView.ScaleType.CENTER_CROP);
             row.setTag(holder);
         } else
         {
