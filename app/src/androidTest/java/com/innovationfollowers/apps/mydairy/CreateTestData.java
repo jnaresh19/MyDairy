@@ -45,8 +45,6 @@ public class CreateTestData extends AndroidTestCase {
     public void testInsertDummyTestData()
     {
 
-
-
         DairyEntryDao helper  = new DairyEntryDao(mContext);
         DairyEntry dairyEntry = new DairyEntry();
 

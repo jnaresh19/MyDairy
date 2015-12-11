@@ -31,32 +31,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/addEntryTitle"
-        android:layout_alignParentTop="true"
+        android:inputType="text"
+        android:paddingBottom="16dp"
+        android:editable="false"
+        android:hint="@string/Title"
+        android:layout_below="@+id/addEntryDate"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:inputType="text"
-        android:text="@string/Title"
-        android:paddingBottom="16dp"/>
+        android:layout_marginTop="43dp"
+        android:outlineProvider="none"
+        android:singleLine="false"
+        android:phoneNumber="false"
+        android:background="#c9d2da"/>
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="120dp"
         android:id="@+id/addEntryDescription"
-        android:layout_below="@+id/addEntryTitle"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:inputType="text"
-        android:text="@string/description"
         android:paddingBottom="16dp"
         android:longClickable="false"
         android:linksClickable="true"
-        android:layout_alignParentEnd="true"/>
+        android:hint="@string/description"
+        android:background="#dee3e4"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/addEntryTitle"
+        android:layout_marginTop="15dp"/>
 
     <HorizontalScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_below="@id/addEntryDescription">
+        android:layout_marginTop="100dp"
+        android:layout_below="@id/addEntryDescription"
+        android:id="@+id/horizontalScrollView">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -66,13 +74,39 @@
             <ImageView
                 android:layout_width="157dp"
                 android:layout_height="105dp"
-                android:id="@+id/addEntryImage"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignBottom="@+id/dairyEntryDescText" />
+                android:id="@+id/addEntryImage"/>
         </LinearLayout>
     </HorizontalScrollView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/addEntryDate"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="12-Nov-2015"
+        android:onClick="onDateSet"
+        android:clickable="true"
+        android:padding="10dp"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textSize="30dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/addEntryTime"
+        android:text="22:10"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:onClick="onTimeSet"
+        android:clickable="true"
+        android:layout_toRightOf="@+id/addEntryDate"
+        android:layout_toEndOf="@+id/addEntryDate"
+        android:layout_alignTop="@+id/addEntryDate"
+        android:padding="10dp"
+        android:textStyle="bold"/>
+
 
 
 </RelativeLayout>

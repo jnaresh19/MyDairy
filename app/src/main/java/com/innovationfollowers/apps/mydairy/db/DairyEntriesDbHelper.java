@@ -42,7 +42,7 @@ public class DairyEntriesDbHelper extends SQLiteOpenHelper
                     DairyEntriesContract.DairyEntries._ID + " INTEGER PRIMARY KEY," +
                     DairyEntriesContract.DairyEntries.COLUMN_NAME_TITLE + " TEXT," +
                     DairyEntriesContract.DairyEntries.COLUMN_NAME_DESCRIPTION + " TEXT," +
-                    DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE + " TEXT," +
+                    DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE + " DATETIME," +
                     DairyEntriesContract.DairyEntries.COLUMN_NAME_IMAGEPATHS + " TEXT);";
     public static final String DATABASE_OPERATIONS = "DATABASE OPERATIONS";
 

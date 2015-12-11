@@ -55,19 +55,25 @@ public class TestDairyEntires extends AndroidTestCase
         DairyEntry dairyEntry = new DairyEntry();
         dairyEntry.setTitle("Celebrated Dasara");
         dairyEntry.setDescription("Enjoyed Dasara");
-        dairyEntry.setDate("12-10-15");
+        dairyEntry.setDate("2015-10-14 22:15:34");
         dairyEntry.setImagePaths(new String[]{"/sdcard/data/data/app/images/img1.jpg",
                 "/sdcard/data/data/app/images/img2.jpg"});
         long id = dairyEntryDao.insertDairyEntry(dairyEntry);
         assertTrue(id != -1);
 
+        dairyEntry.setTitle("Test2");
+        dairyEntry.setDate("2015-10-15 22:15:34");
+        id = dairyEntryDao.insertDairyEntry(dairyEntry);
+        assertTrue(id != -1);
+
+
         List<DairyEntry> allDairyEntries = dairyEntryDao.getAllDairyEntries();
-        assertTrue(allDairyEntries.size() == 1);
+        assertTrue(allDairyEntries.size() == 2);
         DairyEntry dairyEntryFromDb = allDairyEntries.get(0);
         assertEquals(id, dairyEntryFromDb.getId());
-        assertEquals("Celebrated Dasara", dairyEntryFromDb.getTitle());
+        assertEquals("Test2", dairyEntryFromDb.getTitle());
         assertEquals("Enjoyed Dasara", dairyEntryFromDb.getDescription());
-        assertEquals("12-10-15", dairyEntryFromDb.getDate());
+        assertEquals("2015-10-15 22:15:34", dairyEntryFromDb.getDate());
         assertTrue(dairyEntryFromDb.getImagePaths().length == 2);
 
 

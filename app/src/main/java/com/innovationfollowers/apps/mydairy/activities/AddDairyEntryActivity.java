@@ -16,6 +16,10 @@
 
 package com.innovationfollowers.apps.mydairy.activities;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
@@ -30,11 +34,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.innovationfollowers.apps.mydairy.R;
+import com.innovationfollowers.apps.mydairy.dao.DairyEntryDao;
+import com.innovationfollowers.apps.mydairy.model.DairyEntry;
 import com.innovationfollowers.apps.mydairy.util.AsyncDrawable;
 import com.innovationfollowers.apps.mydairy.util.BitmapWorkerTask;
+import com.innovationfollowers.apps.mydairy.util.MonthFormatter;
+
+import java.util.Calendar;
 
 public class AddDairyEntryActivity extends AppCompatActivity
 {
@@ -47,14 +61,63 @@ public class AddDairyEntryActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar1);
         setSupportActionBar(toolbar);
 
+        //by default set date and time to current date & time
+        TextView date = (TextView) findViewById(R.id.addEntryDate);
+        TextView time = (TextView) findViewById(R.id.addEntryTime);
+
+        Calendar today = Calendar.getInstance();
+        int year = today.get(Calendar.YEAR);
+        int day = today.get(Calendar.DATE);
+        int month = today.get(Calendar.MONTH);
+
+        int hr = today.get(Calendar.HOUR);
+        int min = today.get(Calendar.MINUTE);
+
+
+        date.setText(day + "-" + MonthFormatter.getMonthInText(month) + "-" + year);
+        time.setText(hr + ":" + min);
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab1);
         fab.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                EditText title = (EditText) findViewById(R.id.addEntryTitle);
+                EditText desc = (EditText) findViewById(R.id.addEntryDescription);
+                TextView date = (TextView) findViewById(R.id.addEntryDate);
+                TextView time = (TextView) findViewById(R.id.addEntryTime);
+                DairyEntry entry = new DairyEntry();
+                entry.setTitle(title.getText().toString());
+                entry.setDescription(desc.getText().toString());
+                entry.setDate(date.getText().toString()+" "+time.getText().toString());
+
+                final Context baseContext = getBaseContext();
+                DairyEntryDao dao = new DairyEntryDao(baseContext);
+                long id = dao.insertDairyEntry(entry);
+                dao.close();
+
+                if (id > 0)
+                {
+                    CharSequence text = "Entry Added Successfully";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(baseContext, text, duration);
+                    toast.show();
+                } else
+                {
+                    CharSequence text = "Entry Addition failed";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(baseContext, text, duration);
+                    toast.show();
+                }
+
+                Intent intent = new Intent(AddDairyEntryActivity.this, MainActivity.class);
+                startActivity(intent);
+
+
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -98,7 +161,7 @@ public class AddDairyEntryActivity extends AppCompatActivity
             Uri selectedImage = data.getData();
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-            Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
             cursor.moveToFirst();
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
@@ -109,14 +172,52 @@ public class AddDairyEntryActivity extends AppCompatActivity
             // Show the Selected Image on ImageView
             ImageView imageView = (ImageView) findViewById(R.id.addEntryImage);
 
-            BitmapWorkerTask task = new BitmapWorkerTask(imageView,157,105);
+            BitmapWorkerTask task = new BitmapWorkerTask(imageView, 157, 105);
             final AsyncDrawable asyncDrawable =
-                    new AsyncDrawable(getBaseContext().getResources(),null,task);
+                    new AsyncDrawable(getBaseContext().getResources(), null, task);
             imageView.setImageDrawable(asyncDrawable);
             task.execute(picturePath);
 
 
         }
+    }
+
+    public void onDateSet(View view)
+    {
+        Calendar c = Calendar.getInstance();
+        DatePickerDialog dpd = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener()
+        {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth)
+            {
+                TextView date = (TextView) findViewById(R.id.addEntryDate);
+                date.setText(dayOfMonth + "-" + MonthFormatter.getMonthInText(monthOfYear) + "-" + year);
+
+            }
+        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+
+        dpd.show();
+    }
+
+    public void onTimeSet(View view)
+    {
+        Calendar c = Calendar.getInstance();
+        TimePickerDialog dpd = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener()
+        {
+
+            @Override
+            public void onTimeSet(TimePicker view, int hour,
+                                  int min)
+            {
+                TextView time = (TextView) findViewById(R.id.addEntryTime);
+                time.setText(hour + ":" + min);
+
+            }
+        },  c.get(Calendar.HOUR), c.get(Calendar.MINUTE),true);
+
+        dpd.show();
     }
 
 }
