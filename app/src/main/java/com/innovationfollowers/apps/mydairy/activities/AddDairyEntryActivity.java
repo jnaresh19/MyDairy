@@ -47,7 +47,10 @@ import com.innovationfollowers.apps.mydairy.model.DairyEntry;
 import com.innovationfollowers.apps.mydairy.util.AsyncDrawable;
 import com.innovationfollowers.apps.mydairy.util.BitmapWorkerTask;
 import com.innovationfollowers.apps.mydairy.util.MonthFormatter;
+import com.innovationfollowers.apps.mydairy.util.Utilities;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 
 public class AddDairyEntryActivity extends AppCompatActivity
@@ -88,12 +91,43 @@ public class AddDairyEntryActivity extends AppCompatActivity
                 EditText desc = (EditText) findViewById(R.id.addEntryDescription);
                 TextView date = (TextView) findViewById(R.id.addEntryDate);
                 TextView time = (TextView) findViewById(R.id.addEntryTime);
+                ImageView image = (ImageView) findViewById(R.id.addEntryImage);
+                String imagePath = image.getContentDescription().toString();
                 DairyEntry entry = new DairyEntry();
                 entry.setTitle(title.getText().toString());
                 entry.setDescription(desc.getText().toString());
-                entry.setDate(date.getText().toString()+" "+time.getText().toString());
+                String selectedDate = date.getText().toString();
+                String year = getSelectedYear(selectedDate);
+                entry.setDate(selectedDate + " " + time.getText().toString());
 
+                //check if the folder name with year exists
                 final Context baseContext = getBaseContext();
+                File applicationDir = new File(baseContext.getFilesDir().toString());
+                File yearDir = new File(applicationDir + "/Pictures/" + year);
+
+                if (!yearDir.exists())
+                {
+                    yearDir.mkdir();
+                }
+
+                //generate a new name for image
+                long currentTime = Calendar.getInstance().getTimeInMillis();
+                String imageName = currentTime + ".jpg";
+                //copy the image to target dir
+
+                File srcFile = new File(imagePath);
+                File picturesDir = new File(yearDir.getAbsolutePath() + "/" + imageName);
+                try
+                {
+                    Utilities.copyFolder(srcFile,picturesDir,baseContext);
+
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+
+                entry.setImagePaths(new String[]{year+"/"+imageName});
+
                 DairyEntryDao dao = new DairyEntryDao(baseContext);
                 long id = dao.insertDairyEntry(entry);
                 dao.close();
@@ -121,6 +155,12 @@ public class AddDairyEntryActivity extends AppCompatActivity
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private String getSelectedYear(String selectedDate)
+    {
+        String contents[] = selectedDate.split("-");
+        return contents[2];
     }
 
     @Override
@@ -171,6 +211,7 @@ public class AddDairyEntryActivity extends AppCompatActivity
 
             // Show the Selected Image on ImageView
             ImageView imageView = (ImageView) findViewById(R.id.addEntryImage);
+            imageView.setContentDescription(picturePath);
 
             BitmapWorkerTask task = new BitmapWorkerTask(imageView, 157, 105);
             final AsyncDrawable asyncDrawable =
@@ -215,7 +256,7 @@ public class AddDairyEntryActivity extends AppCompatActivity
                 time.setText(hour + ":" + min);
 
             }
-        },  c.get(Calendar.HOUR), c.get(Calendar.MINUTE),true);
+        }, c.get(Calendar.HOUR), c.get(Calendar.MINUTE), true);
 
         dpd.show();
     }

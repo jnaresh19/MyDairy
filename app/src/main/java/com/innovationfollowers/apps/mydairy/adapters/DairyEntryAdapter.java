@@ -88,7 +88,7 @@ public class DairyEntryAdapter extends ArrayAdapter<DairyEntry>
         if (imagePaths.length > 0)
         {
             String imageLocation = imagePaths[0];
-            String fname = new File(context.getFilesDir() + "/Pictures", imageLocation).getAbsolutePath();
+            String fname = new File(context.getFilesDir() + "/Pictures/"+ imageLocation).getAbsolutePath();
             //Bitmap theImage = BitmapFactory.decodeFile(fname);
             // Bitmap theImage = decodeFile(new File(context.getFilesDir() + "/Pictures", imageLocation),157,105);
             //holder.image.setImageBitmap(theImage);
