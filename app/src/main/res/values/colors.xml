@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#406dff</color>
     <color name="colorAccent">#40acff</color>
     <color name="splashScreenColor">#009CA8</color>
+    <color name="primary_material_light">#2196f3</color>
+    <color name="primary_dark_material_light">#577aef</color>
+    <color name="accent_material_light">#3d5afe</color>
 </resources>
