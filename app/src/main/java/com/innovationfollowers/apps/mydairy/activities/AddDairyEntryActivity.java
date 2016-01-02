@@ -17,18 +17,14 @@
 package com.innovationfollowers.apps.mydairy.activities;
 
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -44,10 +40,9 @@ import android.widget.Toast;
 import com.innovationfollowers.apps.mydairy.R;
 import com.innovationfollowers.apps.mydairy.dao.DairyEntryDao;
 import com.innovationfollowers.apps.mydairy.model.DairyEntry;
-import com.innovationfollowers.apps.mydairy.util.AsyncDrawable;
-import com.innovationfollowers.apps.mydairy.util.BitmapWorkerTask;
 import com.innovationfollowers.apps.mydairy.util.MonthFormatter;
 import com.innovationfollowers.apps.mydairy.util.Utilities;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -213,11 +208,13 @@ public class AddDairyEntryActivity extends AppCompatActivity
             ImageView imageView = (ImageView) findViewById(R.id.addEntryImage);
             imageView.setContentDescription(picturePath);
 
-            BitmapWorkerTask task = new BitmapWorkerTask(imageView, 157, 105);
-            final AsyncDrawable asyncDrawable =
-                    new AsyncDrawable(getBaseContext().getResources(), null, task);
-            imageView.setImageDrawable(asyncDrawable);
-            task.execute(picturePath);
+//            BitmapWorkerTask task = new BitmapWorkerTask(imageView, 157, 105);
+//            final AsyncDrawable asyncDrawable =
+//                    new AsyncDrawable(getBaseContext().getResources(), null, task);
+//            imageView.setImageDrawable(asyncDrawable);
+//            task.execute(picturePath);
+
+            Picasso.with(this).load("file:"+picturePath).fit().centerCrop().into(imageView);
 
 
         }

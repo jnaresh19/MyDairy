@@ -16,18 +16,8 @@
 
 package com.innovationfollowers.apps.mydairy.adapters;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,8 +27,11 @@ import android.widget.TextView;
 
 import com.innovationfollowers.apps.mydairy.R;
 import com.innovationfollowers.apps.mydairy.model.DairyEntry;
-import com.innovationfollowers.apps.mydairy.util.AsyncDrawable;
-import com.innovationfollowers.apps.mydairy.util.BitmapWorkerTask;
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DairyEntryAdapter extends ArrayAdapter<DairyEntry>
 {
@@ -101,43 +94,16 @@ public class DairyEntryAdapter extends ArrayAdapter<DairyEntry>
 
     private void loadBitMap(ImageView imageView, String imageFilePath)
     {
-        if (cancelPotentialWork(imageFilePath, imageView)) {
-            BitmapWorkerTask task = new BitmapWorkerTask(imageView,157,105);
-            final AsyncDrawable asyncDrawable =
-                    new AsyncDrawable(context.getResources(),null,task);
-            imageView.setImageDrawable(asyncDrawable);
-            task.execute(imageFilePath);
-        }
+//        if (cancelPotentialWork(imageFilePath, imageView)) {
+//            BitmapWorkerTask task = new BitmapWorkerTask(imageView,157,105);
+//            final AsyncDrawable asyncDrawable =
+//                    new AsyncDrawable(context.getResources(),null,task);
+//            imageView.setImageDrawable(asyncDrawable);
+//            task.execute(imageFilePath);
+//        }
+        Picasso.with(context).load("file:" + imageFilePath).fit().centerCrop().into(imageView);
     }
 
-    public static boolean cancelPotentialWork(String data, ImageView imageView) {
-        final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
-
-        if (bitmapWorkerTask != null) {
-            final String bitmapData = bitmapWorkerTask.getData();
-            // If bitmapData is not yet set or it differs from the new data
-            if (bitmapData == null  || !bitmapData.equals(data)) {
-                // Cancel previous task
-                bitmapWorkerTask.cancel(true);
-            } else {
-                // The same work is already in progress
-                return false;
-            }
-        }
-        // No task associated with the ImageView, or an existing task was cancelled
-        return true;
-    }
-
-    private static BitmapWorkerTask getBitmapWorkerTask(ImageView imageView) {
-        if (imageView != null) {
-            final Drawable drawable = imageView.getDrawable();
-            if (drawable instanceof AsyncDrawable) {
-                final AsyncDrawable asyncDrawable = (AsyncDrawable) drawable;
-                return asyncDrawable.getBitmapWorkerTask();
-            }
-        }
-        return null;
-    }
 
     static class DairyEntryViewHolder
     {
