@@ -75,16 +75,13 @@ public class DairyEntryAdapter extends ArrayAdapter<DairyEntry>
         holder.title.setText(dairyEntry.getTitle());
         holder.desc.setText(dairyEntry.getDescription());
         holder.date.setText(dairyEntry.getDate());
-        //convert byte to bitmap take from contact class
 
         String[] imagePaths = dairyEntry.getImagePaths();
         if (imagePaths.length > 0)
         {
             String imageLocation = imagePaths[0];
             String fname = new File(context.getFilesDir() + "/Pictures/"+ imageLocation).getAbsolutePath();
-            //Bitmap theImage = BitmapFactory.decodeFile(fname);
-            // Bitmap theImage = decodeFile(new File(context.getFilesDir() + "/Pictures", imageLocation),157,105);
-            //holder.image.setImageBitmap(theImage);
+
             loadBitMap(holder.image, fname);
         }
 
@@ -94,13 +91,6 @@ public class DairyEntryAdapter extends ArrayAdapter<DairyEntry>
 
     private void loadBitMap(ImageView imageView, String imageFilePath)
     {
-//        if (cancelPotentialWork(imageFilePath, imageView)) {
-//            BitmapWorkerTask task = new BitmapWorkerTask(imageView,157,105);
-//            final AsyncDrawable asyncDrawable =
-//                    new AsyncDrawable(context.getResources(),null,task);
-//            imageView.setImageDrawable(asyncDrawable);
-//            task.execute(imageFilePath);
-//        }
         Picasso.with(context).load("file:" + imageFilePath).fit().centerCrop().into(imageView);
     }
 

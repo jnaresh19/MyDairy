@@ -33,6 +33,7 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -86,8 +87,7 @@ public class AddDairyEntryActivity extends AppCompatActivity
                 EditText desc = (EditText) findViewById(R.id.addEntryDescription);
                 TextView date = (TextView) findViewById(R.id.addEntryDate);
                 TextView time = (TextView) findViewById(R.id.addEntryTime);
-                ImageView image = (ImageView) findViewById(R.id.addEntryImage);
-                String imagePath = image.getContentDescription().toString();
+
                 DairyEntry entry = new DairyEntry();
                 entry.setTitle(title.getText().toString());
                 entry.setDescription(desc.getText().toString());
@@ -105,23 +105,31 @@ public class AddDairyEntryActivity extends AppCompatActivity
                     yearDir.mkdir();
                 }
 
-                //generate a new name for image
+                final LinearLayout lm = (LinearLayout) findViewById(R.id.imageLinearLayout);
+                int totalAddedImages = lm.getChildCount();
                 long currentTime = Calendar.getInstance().getTimeInMillis();
-                String imageName = currentTime + ".jpg";
-                //copy the image to target dir
 
-                File srcFile = new File(imagePath);
-                File picturesDir = new File(yearDir.getAbsolutePath() + "/" + imageName);
-                try
-                {
-                    Utilities.copyFolder(srcFile,picturesDir,baseContext);
+                String[] imagePaths = new String[totalAddedImages];
 
-                } catch (IOException e)
+                for (int i=0;i<totalAddedImages;i++)
                 {
-                    e.printStackTrace();
+                    ImageView image = (ImageView)lm.getChildAt(i);
+                    String imagePath = image.getContentDescription().toString();
+                    String imageName = currentTime +i + ".jpg";
+                    File srcFile = new File(imagePath);
+                    File picturesDir = new File(yearDir.getAbsolutePath() + "/" + imageName);
+                    try
+                    {
+                        Utilities.copyFolder(srcFile,picturesDir,baseContext);
+
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    imagePaths[i] = year+"/"+imageName;
+
                 }
-
-                entry.setImagePaths(new String[]{year+"/"+imageName});
+                entry.setImagePaths(imagePaths);
 
                 DairyEntryDao dao = new DairyEntryDao(baseContext);
                 long id = dao.insertDairyEntry(entry);
@@ -205,8 +213,15 @@ public class AddDairyEntryActivity extends AppCompatActivity
             // String picturePath contains the path of selected Image
 
             // Show the Selected Image on ImageView
-            ImageView imageView = (ImageView) findViewById(R.id.addEntryImage);
+           // ImageView imageView = (ImageView) findViewById(R.id.addEntryImage);
+            ImageView imageView = new ImageView(this);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(157, 105);
+            imageView.setLayoutParams(lp);
+            imageView.setVisibility(View.VISIBLE);
             imageView.setContentDescription(picturePath);
+
+            final LinearLayout lm = (LinearLayout) findViewById(R.id.imageLinearLayout);
+            lm.addView(imageView);
 
 //            BitmapWorkerTask task = new BitmapWorkerTask(imageView, 157, 105);
 //            final AsyncDrawable asyncDrawable =
