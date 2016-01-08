@@ -89,6 +89,11 @@ public class DairyEntryDao
     }
 
 
+    public int deleteDairyEntry(long id)
+    {
+        return dbHelper.deleteDairyEntry(id,database);
+    }
+
 
 
     public void open() throws SQLException

@@ -16,6 +16,8 @@
 
 package com.innovationfollowers.apps.mydairy.activities;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -23,17 +25,23 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import com.innovationfollowers.apps.mydairy.R;
 import com.innovationfollowers.apps.mydairy.adapters.DairyEntryAdapter;
@@ -82,7 +90,7 @@ public class MainActivity extends AppCompatActivity
         File applicationDir = new File(this.getFilesDir().toString());
         File picturesDir = new File(applicationDir + "/Pictures");
 
-        if(!picturesDir.exists())
+        if (!picturesDir.exists())
         {
             picturesDir.mkdir();
         }
@@ -93,19 +101,94 @@ public class MainActivity extends AppCompatActivity
     private void displayDairyEntires()
     {
         // get the list view
-        ListView listView = (ListView) findViewById(R.id.dairyEntriesListView);
+        final ListView listView = (ListView) findViewById(R.id.dairyEntriesListView);
 
-        // prepare data
-
-        String[] fromColumns = {DairyEntriesContract.DairyEntries.COLUMN_NAME_DATE, DairyEntriesContract.DairyEntries.COLUMN_NAME_TITLE,
-                DairyEntriesContract.DairyEntries.COLUMN_NAME_DESCRIPTION};
-        int[] toViews = {R.id.dairyEntryDateText, R.id.dairyEntryTitleText, R.id.dairyEntryDescText};
 
         DairyEntryDao dairyEntryDao = new DairyEntryDao(getBaseContext());
         List<DairyEntry> dairyEntries = dairyEntryDao.getAllDairyEntries();
-        DairyEntryAdapter adapter = new DairyEntryAdapter(this,R.layout.list_view_dairy_entries,dairyEntries);
+        DairyEntryAdapter adapter = new DairyEntryAdapter(this, R.layout.list_view_dairy_entries, dairyEntries);
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View view, int pos,
+                                    long arg3)
+            {
+
+                DairyEntry dairyEntry = (DairyEntry) (arg0.getAdapter().getItem(pos));
+
+                Intent intent = new Intent(MainActivity.this, EditDairyEntryActivity.class);
+                intent.putExtra("entryId", dairyEntry.getId());
+                intent.putExtra("entryTitle", dairyEntry.getTitle());
+                intent.putExtra("entryDesc", dairyEntry.getDescription());
+                intent.putExtra("entryDate", dairyEntry.getDate());
+                intent.putExtra("entryImagePaths", dairyEntry.getImagePaths());
+                startActivity(intent);
+
+            }
+        });
+
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           int pos, long id)
+            {
+                // TODO Auto-generated method stub
+                DairyEntry dairyEntry = (DairyEntry) (arg0.getAdapter().getItem(pos));
+
+                showEditDeleteDialog(dairyEntry,listView);
+
+
+                return true;
+            }
+        });
+
     }
+
+    private void showEditDeleteDialog(final DairyEntry dairyEntry,final ListView listView)
+    {
+        String names[] = {"Edit", "Delete"};
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        LayoutInflater inflater = getLayoutInflater();
+        View convertView = (View) inflater.inflate(R.layout.edit_delete_list_view, null);
+        alertDialog.setView(convertView);
+        alertDialog.setTitle("Choose Action");
+        ListView lv = (ListView) convertView.findViewById(R.id.edit_delete_list_view);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names);
+        lv.setAdapter(adapter);
+        final AlertDialog ad = alertDialog.show();
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View view, int pos,
+                                    long arg3)
+            {
+                if(pos == 1)
+                {
+                    //delete
+                    DairyEntryDao dairyEntryDao = new DairyEntryDao(getBaseContext());
+                    int rows = dairyEntryDao.deleteDairyEntry(dairyEntry.getId());
+                    if (rows == 1)
+                    {
+                        DairyEntryAdapter adapter = (DairyEntryAdapter) listView.getAdapter();
+                        adapter.remove(dairyEntry);
+                        adapter.notifyDataSetChanged();
+                        Toast.makeText(MainActivity.this, "entry deleted successfully", Toast.LENGTH_SHORT).show();
+                        ad.dismiss();
+                    }
+                    else
+                    {
+                        Toast.makeText(MainActivity.this, "Failed to delete entry", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+    }
+
 
     @Override
     public void onBackPressed()

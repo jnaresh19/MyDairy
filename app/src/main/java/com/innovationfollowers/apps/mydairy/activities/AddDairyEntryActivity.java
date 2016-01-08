@@ -213,7 +213,7 @@ public class AddDairyEntryActivity extends AppCompatActivity
             // String picturePath contains the path of selected Image
 
             // Show the Selected Image on ImageView
-           // ImageView imageView = (ImageView) findViewById(R.id.addEntryImage);
+
             ImageView imageView = new ImageView(this);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(157, 105);
             imageView.setLayoutParams(lp);
@@ -222,13 +222,6 @@ public class AddDairyEntryActivity extends AppCompatActivity
 
             final LinearLayout lm = (LinearLayout) findViewById(R.id.imageLinearLayout);
             lm.addView(imageView);
-
-//            BitmapWorkerTask task = new BitmapWorkerTask(imageView, 157, 105);
-//            final AsyncDrawable asyncDrawable =
-//                    new AsyncDrawable(getBaseContext().getResources(), null, task);
-//            imageView.setImageDrawable(asyncDrawable);
-//            task.execute(picturePath);
-
             Picasso.with(this).load("file:"+picturePath).fit().centerCrop().into(imageView);
 
 
@@ -272,5 +265,7 @@ public class AddDairyEntryActivity extends AppCompatActivity
 
         dpd.show();
     }
+
+
 
 }

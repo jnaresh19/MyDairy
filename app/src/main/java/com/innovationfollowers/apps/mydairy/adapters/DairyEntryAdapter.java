@@ -102,4 +102,11 @@ public class DairyEntryAdapter extends ArrayAdapter<DairyEntry>
         TextView desc;
         TextView date;
     }
+
+    @Override
+    public void notifyDataSetChanged()
+    {
+        super.notifyDataSetChanged();
+
+    }
 }
